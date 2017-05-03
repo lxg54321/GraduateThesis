@@ -1,0 +1,106 @@
+% Copyright (c) 2008-2009 solvethis
+% Copyright (c) 2010-2011 Casper Ti. Vector
+% Public domain.
+
+\chapter{需求分析与设计目标}
+本章将分析物理层WiFi安全研究对验证平台的需求，提出本文的设计目标。
+本章首先在\ref{sec:platform_demand}节分析物理层WiFi安全研究对验证平台的需求，
+然后在\ref{sec:design_goal}节提出本文的设计目标。
+
+	\section{安全研究对验证平台的需求}\label{sec:platform_demand}
+	本节分析物理层WiFi安全研究对验证平台的需求。
+	首先分析模拟WiFi攻击的需求，见\ref{sec:demand_perform_attack}小节，
+	然后研究安全机制的需求，分为基于加密和基于非加密两类，基于加密的安全机制见\ref{sec:demand_encryption}小节，
+	基于非加密的安全机制主要是基于身份验证，见\ref{sec:demand_identification}小节。
+
+		\subsection{模拟WiFi攻击}\label{subsec:demand_perform_attack}
+		\ref{sec:security_research}节曾介绍过，WiFi攻击有多种类型，伪装、DoS攻击、密钥破解等。
+		模拟不同的WiFi攻击对验证平台有一些共同的需求，可以总结为以下几点。
+		\begin{itemize}
+			\item 可监听报文，可兼容上层网络分析工具。
+			监听报文是网络设备的基本功能，而上层网络分析工具在发起WiFi攻击时很常用，例如使用网络工具Aircrack-ng破解WEP、WPA、WPA2加密\cite{ijarcet12wpa2}。
+			\item 接收端提供常见的物理层信息，如CSI、RSSI等。
+			一些攻击者除了需要监听合法设备报文内容外，还需要获取接收信号的物理层信息，用来推测用户所发内容\cite{ccs16csi}或破解密钥\cite{cns15key}等。
+			\item 发送端任意修改MAC层帧内容，包括IP地址、MAC地址、AP模式下的SSID等。
+			自定义帧内容是伪装攻击的前提，如需要修改源MAC地址和目的MAC地址发起DoS攻击\cite{wisec06spoofing}；
+			\item 可与商用设备实时通信。攻击对象是商用设备，如果验证平台不能与商用设备实时通信，则可发起的攻击会很受限。
+		\end{itemize}
+
+		\subsection{基于加密的安全机制}\label{subsec:demand_encryption}
+		对传输内容进行加密是网络安全中常采取的措施，攻击者虽然可以“听”到内容但却无法理解。
+		基于加密的安全机制分成几个关键步骤，密钥生成、密钥分发、加密解密。
+		在\ref{subsec:80211security}小节提到，现有的WiFi加密协议有漏洞，研究者利用物理层信息对加密协议进行加强，对验证平台提出以下需求。
+		\begin{itemize}
+			\item 接收端提供常见的物理层信息，如CSI、RSSI等。
+			在\cite{infocom13key}、\cite{iwqos14key}中利用CSI生成密钥，
+			在\cite{mobicom08key}、\cite{mobicom09key}、\cite{tmc13key}中利用RSSI生成密钥，
+			在\cite{access16key}中实验研究了CSI和RSSI生成密钥的性能。
+			表\ref{tab:key_generation_summary}总结了现有密钥生成的研究所需的物理层信息。
+			\item 可兼容上层网络分析工具。如使用wireshark进行抓包\cite{tmc13key}。
+			\item 可在实时通信中验证，通信双方达成密钥一致性。\cite{access16key}中使用WARP平台进行验证，但由于WARP平台延迟高，无法满足密钥一致性的要求。
+			\item 支持软硬件加密解密模块替换。加密解密过程需要密集的计算，软件可以快速实现加密算法，硬件可以提高效率，满足协议要求的时序。
+		\end{itemize}
+		\begin{table}[!hbp]
+		\centering
+		\caption{现有基于物理层信息的密钥生成系统总结}
+		\label{tab:key_generation_summary}
+			\begin{tabular}{|l|l|l|l|} \hline
+			现有工作 & 物理层信息 & 具体技术 & 使用的验证平台 \\ \hline
+			INFOCOM 13\cite{infocom13key} & CSI & 加时间戳，信道补偿 & Intel 5300 NIC \\ \hline
+			IWQoS 14\cite{iwqos14key} & CSI & 联合多子载波，哈希 & Intel 5300 NIC \\ \hline
+			TMC 13\cite{tmc13key} & RSSI & 信息重构 & Atheros AR 5B95 \\ \hline
+			Access 16\cite{access16key} & RSSI CSI & 多环境测试分析结果 & WARPv3 \\ \hline
+			\end{tabular}
+		\end{table}
+
+		\subsection{基于身份验证的安全机制}\label{subsec:demand_identification}
+		基于加密的安全机制有一定局限性，复杂的加密算法难以在实际通信系统中实现\cite{ccs16mumimo}，
+		因此一些研究者探索非加密的安全机制，即基于身份验证的安全机制\cite{ieeewc10noncryp}。
+		对验证平台提出以下需求。
+		\begin{itemize}
+			\item 接收端提供常见的物理层信息，如CSI、RSSI等，除此之外，还支持扩展物理层信息。
+			在\cite{mobicom08radiometric}中用到了频偏、信号相关性和星座点偏移，
+			在\cite{milcom11cir}中用到了CIR，CIR见\ref{sec:background_csi}节。
+			表\ref{tab:phy_auth_summary}总结了现有物理层身份验证的研究所需的物理层信息。
+			\item 自定义物理层数据处理流程。自定义物理层帧格式和物理层控制逻辑，
+			例如\cite{asiaccs14csi}中在物理层发送端引入了人为的频偏，只有支持物理层编程的平台可以做到这一点。
+			\item 可与商用设备实时通信，增加验证结果的可信度。
+			\item 支持软硬件物理层信息处理模块替换。对物理层信息的处理过程需要密集的计算，软件可以快速实现加密算法，硬件可以提高效率，满足协议要求的时序。
+		\end{itemize}
+		\begin{table}[!hbp]
+		\centering
+		\caption{现有基于物理层信息的身份验证系统总结}
+		\label{tab:phy_auth_summary}
+			\begin{tabular}{|p{0.2\textwidth}|l|p{0.2\textwidth}|p{0.3\textwidth}|} \hline
+			现有工作 & 物理层信息 & 具体技术 & 使用的验证平台 \\ \hline
+			IEEE TPDS 13\cite{tpds13spoofing} & RSS & 聚类分析，支持向量机 & Orinoco silver card，Atheros miniPCI NIC \\ \hline
+			IEEE Wireless Commun 10\cite{ieeewc10noncryp} & RSS & RSS序列反馈 & Dell Latitude E5400 laptop \\ \hline
+			TVT 16\cite{tvt16spoofing} & RSSI & 博弈论，增强学习 & USRP N210 \\ \hline
+			MobiSys 10\cite{mobisys10proximity} & RSS & 临近认证 & Nokia N800 Internet Tablets \\ \hline
+			MILCOM 11\cite{milcom11cir} & CIR & 噪声消除 & 仿真软件 \\ \hline
+			ICC 13\cite{icc13cir} & CIR & 利用多径延迟 & 仿真软件 \\ \hline
+			INFOCOM 13\cite{infocom13csi} & CSI & CSI精度增强 & Intel IWL5300 NIC \\ \hline
+			ASIA CCS 14\cite{asiaccs14csi} & 频偏 & 引入人为频偏 & USRP \\ \hline
+			ICC 07\cite{icc07xiao} & 频偏 & 多径效应 & 仿真软件WiSE\cite{bell95wise} \\ \hline
+			TMC 10\cite{tmc10clock} & 时钟偏移 & 时间戳 & Linksys WPC 55AG, Intel 3945ABG \\ \hline
+			\end{tabular}
+		\end{table}
+
+	\section{设计目标}\label{sec:design_goal}
+	综合以上模拟WiFi攻击、基于加密的安全机制、基于身份验证的安全机制对验证平台的需求，
+	为了实现一种支持物理层WiFi安全研究的验证平台，本文对验证平台提出了如下设计目标：
+	\begin{itemize}
+		\item 实现802.11协议，可与商用无线网卡实时通信；
+		\item 支持自定义数据处理流程，包括物理层和MAC层；
+		\item 方便获取常用物理层信息，如RSSI、CSI、频偏等，支持用户扩展物理层信息；
+		\item 支持数据分析的软件和硬件实现，提供软硬件模块互换的能力；
+		\item 可与上层网络协议栈连接，兼容常见网络分析工具；
+	\end{itemize}
+
+	实现上述目标一个挑战是如何保证性能的同时，提供物理层足够高的可编程性。
+	一般而言，可编程性较高的平台性能较差，比如第二章提到的GNU Radio，使用C++和Python编程，
+	提供方便的可视化编程界面，但吞吐率和延时无法达到802.11a/g的要求。
+	性能满足要求的平台一般可编程性差，甚至不具备物理层的可编程能力，
+	商用网卡的性能最高，可以完全满足协议要求，但不具备物理层的可编程性。
+	本文基于北京大学的GRT系统\cite{can14grt}进行开发，提出支持物理层WiFi安全研究的验证平台GRTSEC（GRT for Security）。
+	GRT系统同时也是本文的前期工作，在第\ref{chap:implementation}章会部分进行介绍。
