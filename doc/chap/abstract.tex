@@ -6,7 +6,7 @@
 
 	现代社会中，WiFi作为一种快速、便捷、不考虑流量的无线上网方式，成为人们基本的生活需求，WiFi接入点遍布家庭、企业、公共场所等区域。
 	WiFi的普及也为人们的网络生活带来了安全隐患，一些不法分子通过WiFi向用户发起攻击。
-	现有的WiFi加密协议包括WEP、WPA和WPA2等存在安全漏洞，存在被破解的可能，
+	现有的WiFi加密协议包括WEP、WPA和WPA2等存在安全漏洞，有被破解的可能，
 	有的攻击者破解个人WiFi的密码，目的是占用网络资源，降低合法用户的服务质量，俗称“蹭网”。
 	另有一些攻击者利用带无线网卡的电脑和网络分析软件搭建钓鱼WiFi，监听网络报文，
 	获取用户手机号、网站账号、密码等敏感信息，甚至可以窃取钱财，给用户带来巨大损失。
@@ -16,34 +16,47 @@
 	研究者探索如何利用这些信息加强WiFi的安全性。
 
 	WiFi安全的研究需要有开发和验证平台，用以实现和评估研究成果。
-	物理层的安全研究对验证平台提出很高的要求，由软件实现的WiFi物理层无法满足协议的要求，而硬件实现往往可编程性较差。
+	物理层的安全研究对验证平台提出很高的要求，由软件实现的WiFi物理层无法满足协议对性能的要求，而硬件实现的物理层往往不可编程。
 	从近些年的研究看，验证平台的质量常常成为制约研究成果有效性的瓶颈，
 	一些验证平台不支持物理层的编程，一些验证平台延迟过高无法与商用WiFi设备实时通信。
 	“工欲善其事，必先利其器”，支持物理层编程的高性能WiFi验证平台成为WiFi安全研究必不可少的工具。
 
 	本文对近年来物理层WiFi安全的研究进行了深入分析，总结了这些研究对验证平台的需求，
-	设计了一种支持物理层WiFi安全研究的验证平台，并利用商用设备进行了实现，
-	通过实际的使用样例论证了可以满足绝大多数物理层WiFi安全研究的需求，
-	并基于此平台搭建了伪装WiFi，提出了一种用于识别伪装WiFi的新型WiFi安全认证技术。
+	设计了一种支持物理层WiFi安全研究的验证平台GRTSEC，并利用商用设备进行了实现，
+	结合实际的使用样例论证了可以满足物理层WiFi安全研究的需求。
+	% 作为使用样例，基于此平台搭建了伪装WiFi，并验证了利用物理层信息对WiFi设备进行识别技术的可行性。
 
 \end{cabstract}
 
 \begin{eabstract}
+	In modern society, WiFi is people's basic needs of life.
+	As a fast, convenient, cheap wireless access to Internet, WiFi access point spread all over the home, business, public places.
+	WiFi popularity for people's network life has brought security risks, some people attack the user through WiFi.
+	Existing WiFi encryption protocols include WEP, WPA and WPA2 have security vulnerabilities, there is the possibility of being cracked.
+	Some attackers crack personal WiFi password, the purpose is to take up network resources,
+	reduce the quality of legitimate users of the service, commonly known as "rub network."
+	Some other attackers use the commercial computer and network analysis software to build phishing WiFi,
+	monitor network packets, access to mobile phone number, website account, password and other sensitive information,
+	and even steal money, which bring to the user a huge loss.
 
-	In modern society, WiFi as a fast, convenient, do not consider the flow of wireless Internet access, as people's basic needs of life, WiFi access point throughout the family, business, public places and other regions.
-	WiFi popularity for people's network life has brought security risks, some lawless elements through WiFi to attack the user.
-	Existing WiFi encryption protocols include WEP, WPA and WPA2 and other security vulnerabilities, there is the possibility of being cracked.
-	Some attackers crack personal WiFi password, the purpose is to take up network resources, reduce the quality of legitimate users of the service, commonly known as "rub network."
-	Some other attackers use the wireless network card computer and network analysis software to build fishing WiFi, monitor network packets, access to mobile phone number, website account, password and other sensitive information, and even steal money, to the user a huge loss.
+	In order to detect and prevent the endless attacks, WiFi security researches are carried out extensively.
+	In recent years, the security mechanism combined with the physical layer has become the new interest of WiFi security research.
+	The physical layer contains rich information such as wireless channel information, device location and signal quality.
+	Researchers explore how to use these information to enhance WiFi security.
 
-	In order to detect and prevent the endless attacks, for WiFi security research carried out extensively.
-	In recent years, the security mechanism combined with the physical layer has become the hotspot of WiFi security research. The physical layer contains rich information such as wireless channel, device location and signal quality. Researchers explore how to use this information to enhance WiFi security.
+	WiFi security researches require a development and verification platform to implement and evaluate research results.
+	The physical layer of security research on the verification platform made a high demand,
+	by the software to achieve the WiFi physical layer can not meet the requirements of the real-time communication,
+	while hardware implementation is often poor programmability.
+	In recent years, the quality of the verification platform has often become a bottleneck in restricting the effectiveness of research results.
+	Some verification platforms do not support the programming of the physical layer.
+	Some of the verification platforms are too slow to communicate with commercial WiFi devices in real time.
+	To support the physical layer programming high-performance WiFi verification platform for WiFi security research is an indispensable tool.
 
-	WiFi security research requires a development and verification platform to implement and evaluate research results.
-	The physical layer of security research on the verification platform made a high demand, by the software to achieve the WiFi physical layer can not meet the requirements of the agreement, and hardware implementation is often poor programmability.
-	In recent years, the quality of the verification platform has often become a bottleneck in restricting the effectiveness of research results. Some verification platforms do not support the programming of the physical layer. Some of the verification platforms are too late to communicate with commercial WiFi devices in real time.
-	"Good practice, must first of its profits," to support the physical layer programming high-performance WiFi authentication platform for WiFi security research is an indispensable tool.
-
-	In this paper, the research on WiFi security of physical layer in recent years is analyzed, and the requirements of verification platform are summarized. A verification platform supporting the study of WiFi layer security is designed and implemented by commercial device. This paper demonstrates the need to meet the needs of most physical layer WiFi security research, and builds a camouflage WiFi based on this platform, and proposes a new WiFi authentication technology for recognizing camouflage WiFi.
+	In this paper, we study the research on WiFi security of physical layer in recent years,
+	and summarize the requirements of verification platform.
+	A verification platform called GRTSEC supporting the study of WiFi layer security is designed and implemented by commercial device.
+	This paper demonstrates the need to meet the needs of most physical layer WiFi security research,
+	and builds a camouflage WiFi based on this platform, and proposed a WiFi device identification technology with physical layer information .
 
 \end{eabstract}

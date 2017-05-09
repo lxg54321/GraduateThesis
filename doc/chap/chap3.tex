@@ -2,16 +2,16 @@
 % Copyright (c) 2010-2011 Casper Ti. Vector
 % Public domain.
 
-\chapter{需求分析与设计目标}
+\chapter{需求分析与设计目标}\label{chap:demand}
 本章将分析物理层WiFi安全研究对验证平台的需求，提出本文的设计目标。
 本章首先在\ref{sec:platform_demand}节分析物理层WiFi安全研究对验证平台的需求，
 然后在\ref{sec:design_goal}节提出本文的设计目标。
 
 	\section{安全研究对验证平台的需求}\label{sec:platform_demand}
 	本节分析物理层WiFi安全研究对验证平台的需求。
-	首先分析模拟WiFi攻击的需求，见\ref{sec:demand_perform_attack}小节，
-	然后研究安全机制的需求，分为基于加密和基于非加密两类，基于加密的安全机制见\ref{sec:demand_encryption}小节，
-	基于非加密的安全机制主要是基于身份验证，见\ref{sec:demand_identification}小节。
+	首先分析模拟WiFi攻击的需求，见\ref{subsec:demand_perform_attack}小节，
+	然后研究安全机制的需求，分为基于加密和基于非加密两类，基于加密的安全机制见\ref{subsec:demand_encryption}小节，
+	基于非加密的安全机制主要是基于身份验证，见\ref{subsec:demand_identification}小节。
 
 		\subsection{模拟WiFi攻击}\label{subsec:demand_perform_attack}
 		\ref{sec:security_research}节曾介绍过，WiFi攻击有多种类型，伪装、DoS攻击、密钥破解等。
@@ -32,12 +32,13 @@
 		在\ref{subsec:80211security}小节提到，现有的WiFi加密协议有漏洞，研究者利用物理层信息对加密协议进行加强，对验证平台提出以下需求。
 		\begin{itemize}
 			\item 接收端提供常见的物理层信息，如CSI、RSSI等。
-			在\cite{infocom13key}、\cite{iwqos14key}中利用CSI生成密钥，
-			在\cite{mobicom08key}、\cite{mobicom09key}、\cite{tmc13key}中利用RSSI生成密钥，
-			在\cite{access16key}中实验研究了CSI和RSSI生成密钥的性能。
+			在基于加密的WiFi安全研究中或利用CSI生成密钥\cite{infocom13key}、\cite{iwqos14key}，
+			或利用RSSI生成密钥\cite{mobicom08key}、\cite{mobicom09key}、\cite{tmc13key}，
+			也有文章研究了CSI和RSSI生成密钥的性能\cite{access16key}。
 			表\ref{tab:key_generation_summary}总结了现有密钥生成的研究所需的物理层信息。
-			\item 可兼容上层网络分析工具。如使用wireshark进行抓包\cite{tmc13key}。
-			\item 可在实时通信中验证，通信双方达成密钥一致性。\cite{access16key}中使用WARP平台进行验证，但由于WARP平台延迟高，无法满足密钥一致性的要求。
+			\item 可兼容上层网络分析工具。有研究需要使用wireshark进行抓包\cite{tmc13key}。
+			\item 可在实时通信中验证，通信双方达成密钥一致性。有研究使用WARP平台进行验证\cite{access16key}，
+			但由于WARP平台延迟高，无法满足密钥一致性的要求。
 			\item 支持软硬件加密解密模块替换。加密解密过程需要密集的计算，软件可以快速实现加密算法，硬件可以提高效率，满足协议要求的时序。
 		\end{itemize}
 		\begin{table}[!hbp]
@@ -59,11 +60,11 @@
 		对验证平台提出以下需求。
 		\begin{itemize}
 			\item 接收端提供常见的物理层信息，如CSI、RSSI等，除此之外，还支持扩展物理层信息。
-			在\cite{mobicom08radiometric}中用到了频偏、信号相关性和星座点偏移，
-			在\cite{milcom11cir}中用到了CIR，CIR见\ref{sec:background_csi}节。
+			例如使用频偏、信号相关性和星座点偏移\cite{mobicom08radiometric}，
+			使用CIR\cite{milcom11cir}。
 			表\ref{tab:phy_auth_summary}总结了现有物理层身份验证的研究所需的物理层信息。
 			\item 自定义物理层数据处理流程。自定义物理层帧格式和物理层控制逻辑，
-			例如\cite{asiaccs14csi}中在物理层发送端引入了人为的频偏，只有支持物理层编程的平台可以做到这一点。
+			例如有研究在物理层发送端引入了人为的频偏\cite{asiaccs14csi}，只有支持物理层编程的平台可以做到这一点。
 			\item 可与商用设备实时通信，增加验证结果的可信度。
 			\item 支持软硬件物理层信息处理模块替换。对物理层信息的处理过程需要密集的计算，软件可以快速实现加密算法，硬件可以提高效率，满足协议要求的时序。
 		\end{itemize}
@@ -93,8 +94,8 @@
 		\item 实现802.11协议，可与商用无线网卡实时通信；
 		\item 支持自定义数据处理流程，包括物理层和MAC层；
 		\item 方便获取常用物理层信息，如RSSI、CSI、频偏等，支持用户扩展物理层信息；
-		\item 支持数据分析的软件和硬件实现，提供软硬件模块互换的能力；
-		\item 可与上层网络协议栈连接，兼容常见网络分析工具；
+		\item 支持安全算法的软件和硬件实现，提供软硬件模块互换的能力；
+		\item 可与上层网络协议栈连接，兼容常见网络分析工具。
 	\end{itemize}
 
 	实现上述目标一个挑战是如何保证性能的同时，提供物理层足够高的可编程性。
@@ -103,4 +104,4 @@
 	性能满足要求的平台一般可编程性差，甚至不具备物理层的可编程能力，
 	商用网卡的性能最高，可以完全满足协议要求，但不具备物理层的可编程性。
 	本文基于北京大学的GRT系统\cite{can14grt}进行开发，提出支持物理层WiFi安全研究的验证平台GRTSEC（GRT for Security）。
-	GRT系统同时也是本文的前期工作，在第\ref{chap:implementation}章会部分进行介绍。
+	GRT系统同时也是本文的前期工作，在第\ref{chap:grt2.0}章会部分进行介绍。
